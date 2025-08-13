@@ -2,7 +2,7 @@ from src.TextSummarizer.constants import *
 from src.TextSummarizer.utils.common_utils import read_yaml, create_dir
 from src.TextSummarizer.exceptions.customexception import TextSummarizerException
 from src.TextSummarizer.logger.logger import logger
-from src.TextSummarizer.entity.config_entity import DataIngestionConfig
+from src.TextSummarizer.entity.config_entity import DataIngestionConfig, DataTransformationConfig
 
 from pathlib import Path
 import os, sys
@@ -46,5 +46,28 @@ class ConfigurationManager:
 
         except Exception as e:
             logger.error(f'Cannot get the data ingestion configuration {e}')
+            raise TextSummarizerException(e,sys)
+        
+    
+    def get_data_transforamtion_config(self)-> DataTransformationConfig:
+        try:
+            config = self.config.data_transformation
+            file_path = config.data_path
+            tokenizer = config.tokenizer_name
+
+            ## creating the Data Transformation directory
+            create_dir([config.root_dir])
+            logger.info(f"Directory created successfully at: {config.root_dir}")
+
+            data_transformation_config = DataTransformationConfig(
+                root_dir=config.root_dir,
+                data_path=file_path,
+                tokenizer_name=tokenizer
+            )
+
+            return data_transformation_config
+
+        except Exception as e:
+            logger.error(f'failed to initialize get_data_transformation_config, {e}')
             raise TextSummarizerException(e,sys)
 
